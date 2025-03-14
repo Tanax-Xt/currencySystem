@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Currency Tracking API
+  description: API для отслеживания курса валют
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+
+paths:
+  /currencies:
+    get:
+      summary: Получить список отслеживаемых валют
+      operationId: getCurrencies
+      responses:
+        "200":
+          description: Успешный запрос, возвращает список валют
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Currency"
+        "400":
+          description: Некорректный запрос
+        "500":
+          description: Внутренняя ошибка сервера
+
+    post:
+      summary: Добавить новую валюту для отслеживания
+      operationId: addCurrency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurrencyRequest"
+      responses:
+        "201":
+          description: Валюта успешно добавлена
+        "400":
+          description: Некорректные данные в запросе
+        "500":
+          description: Внутренняя ошибка сервера
+
+  /currencies/{id}:
+    get:
+      summary: Получить информацию о конкретной валюте
+      operationId: getCurrency
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Успешный запрос, возвращает данные валюты
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Currency"
+        "404":
+          description: Валюта не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+
+    put:
+      summary: Обновить данные валюты
+      operationId: updateCurrency
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurrencyRequest"
+      responses:
+        "200":
+          description: Данные валюты успешно обновлены
+        "400":
+          description: Некорректные данные в запросе
+        "404":
+          description: Валюта не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+
+    delete:
+      summary: Удалить валюту из отслеживания
+      operationId: deleteCurrency
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Валюта успешно удалена
+        "404":
+          description: Валюта не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    Currency:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseCurrency:
+          type: string
+          default: RUB
+        priceChangeRange:
+          type: string
+          example: "+10%/-10%"
+        description:
+          type: string
+
+    CurrencyRequest:
+      type: object
+      required:
+        - name
+        - baseCurrency
+        - priceChangeRange
+      properties:
+        name:
+          type: string
+        baseCurrency:
+          type: string
+          default: RUB
+        priceChangeRange:
+          type: string
+          example: "+10%/-10%"
+        description:
+          type: string
