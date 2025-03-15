@@ -23,7 +23,7 @@ public class CurrencyController {
             @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> get_currencies() {
+    public ResponseEntity<String> getCurrencies() {
         return new ResponseEntity<>("No business logic", HttpStatus.OK);
     }
 
@@ -35,7 +35,7 @@ public class CurrencyController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные в запросе"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> post_currency(@Valid @RequestBody CurrencyRequest currencyRequest) {
+    public ResponseEntity<String> postCurrency(@Valid @RequestBody CurrencyRequest currencyRequest) {
         return new ResponseEntity<>("No business logic", HttpStatus.CREATED);
     }
 
@@ -46,7 +46,7 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> get_currency(@PathVariable String id) {
+    public ResponseEntity<String> getCurrency(@PathVariable String id) {
         return new ResponseEntity<>("No business logic", HttpStatus.OK);
     }
 
@@ -58,7 +58,7 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> put_currency(@PathVariable String id, @Valid @RequestBody CurrencyRequest currencyRequest) {
+    public ResponseEntity<String> putCurrency(@PathVariable String id, @Valid @RequestBody CurrencyRequest currencyRequest) {
         return new ResponseEntity<>("No business logic", HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> delete_currency(@PathVariable String id) {
+    public ResponseEntity<String> deleteCurrency(@PathVariable String id) {
         return new ResponseEntity<>("No business logic", HttpStatus.NO_CONTENT);
     }
 
