@@ -1,0 +1,20 @@
+server:
+  port: 8080
+  servlet:
+    context-path: "/api"
+
+spring:
+  application:
+    name: "currencySystem"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/currency_tracker
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.sql
+    enabled: false
