@@ -7,7 +7,7 @@ spring:
   application:
     name: "currencySystem"
   datasource:
-    url: jdbc:postgresql://localhost:5432/currency_tracker
+    url: jdbc:postgresql://db:5432/currency_tracker
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
