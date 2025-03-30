@@ -45,6 +45,9 @@ public class CurrencyController {
     })
     public ResponseEntity<Currency> postCurrency(@Valid @RequestBody CurrencyRequest currencyRequest) {
         Currency createdCurrency = currencyService.addCurrency(currencyRequest.toCurrency());
+        if (createdCurrency == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCurrency);
     }
 

@@ -17,22 +17,26 @@ public class CurrencyService {
 
     @Transactional(readOnly = true)
     public List<Currency> getAllCurrencies() {
-        return currencyRepository.findAll();
+        return currencyRepository.findByIsDeletedFalse();
     }
 
     @Transactional(readOnly = true)
     public Currency getCurrencyById(UUID id) {
-        return currencyRepository.findById(id).orElse(null);
+        return currencyRepository.findByIdAndIsDeletedFalse(id).orElse(null);
     }
 
     @Transactional
     public Currency addCurrency(Currency currency) {
+        Currency existingCurrency = currencyRepository.findByNameAndIsDeletedFalse(currency.getName()).orElse(null);
+        if (existingCurrency != null) {
+            return null;
+        }
         return currencyRepository.save(currency);
     }
 
     @Transactional
     public Currency updateCurrency(UUID id, Currency currency) {
-        Currency currencyToUpdate = currencyRepository.findById(id).orElse(null);
+        Currency currencyToUpdate = currencyRepository.findByIdAndIsDeletedFalse(id).orElse(null);
         if (currencyToUpdate == null) {
             return null;
         }
@@ -45,6 +49,11 @@ public class CurrencyService {
 
     @Transactional
     public void deleteCurrency(UUID id) {
-        currencyRepository.deleteById(id);
+        Currency currencyToDelete = currencyRepository.findByIdAndIsDeletedFalse(id).orElse(null);
+        if (currencyToDelete == null) {
+            return;
+        }
+        currencyToDelete.setDeleted(true);
+        currencyRepository.save(currencyToDelete);
     }
 }

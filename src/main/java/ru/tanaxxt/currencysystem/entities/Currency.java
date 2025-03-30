@@ -14,7 +14,7 @@ public class Currency {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -26,4 +26,6 @@ public class Currency {
     @Column()
     private String description;
 
+    @Column()
+    private boolean isDeleted;
 }
