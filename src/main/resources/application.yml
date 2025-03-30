@@ -16,5 +16,5 @@ spring:
       ddl-auto: none
     show-sql: true
   liquibase:
-    change-log: classpath:db/changelog/27-01-changelog.sql
+    change-log: classpath:db/changelog/db.changelog.sql
     enabled: true
