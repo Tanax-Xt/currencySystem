@@ -5,3 +5,6 @@
 ```bash
 docker compose up -d --build
 ```
+
+# Swagger
+Документация API доступен по адресу [localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html)

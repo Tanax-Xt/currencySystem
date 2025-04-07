@@ -5,17 +5,26 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.tanaxxt.currencysystem.entities.Currency;
 import ru.tanaxxt.currencysystem.requests.CurrencyRequest;
+import ru.tanaxxt.currencysystem.services.CurrencyService;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/currencies")
 @Validated
+@RequiredArgsConstructor
 @Tag(name = "Currencies")
 public class CurrencyController {
+    private final CurrencyService currencyService;
+  
     @GetMapping()
     @Operation(summary = "Получить список отслеживаемых валют")
     @ApiResponses(value = {
@@ -23,10 +32,9 @@ public class CurrencyController {
             @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> getCurrencies() {
-        return new ResponseEntity<>("No business logic", HttpStatus.OK);
+    public List<Currency> getCurrencies() {
+        return currencyService.getAllCurrencies();
     }
-
 
     @PostMapping()
     @Operation(summary = "Добавить новую валюту для отслеживания")
@@ -35,8 +43,12 @@ public class CurrencyController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные в запросе"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> postCurrency(@Valid @RequestBody CurrencyRequest currencyRequest) {
-        return new ResponseEntity<>("No business logic", HttpStatus.CREATED);
+    public ResponseEntity<Currency> postCurrency(@Valid @RequestBody CurrencyRequest currencyRequest) {
+        Currency createdCurrency = currencyService.addCurrency(currencyRequest.toCurrency());
+        if (createdCurrency == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCurrency);
     }
 
     @GetMapping("/{id}")
@@ -46,8 +58,12 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> getCurrency(@PathVariable String id) {
-        return new ResponseEntity<>("No business logic", HttpStatus.OK);
+    public ResponseEntity<Currency> getCurrency(@PathVariable UUID id) {
+        Currency currency = currencyService.getCurrencyById(id);
+        if (currency == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(currency);
     }
 
     @PutMapping("/{id}")
@@ -58,8 +74,12 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> putCurrency(@PathVariable String id, @Valid @RequestBody CurrencyRequest currencyRequest) {
-        return new ResponseEntity<>("No business logic", HttpStatus.OK);
+    public ResponseEntity<Currency> putCurrency(@PathVariable UUID id, @Valid @RequestBody CurrencyRequest currencyRequest) {
+        Currency currency = currencyService.updateCurrency(id, currencyRequest.toCurrency());
+        if (currency == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(currency);
     }
 
     @DeleteMapping("/{id}")
@@ -69,8 +89,13 @@ public class CurrencyController {
             @ApiResponse(responseCode = "404", description = "Валюта не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    public ResponseEntity<String> deleteCurrency(@PathVariable String id) {
-        return new ResponseEntity<>("No business logic", HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteCurrency(@PathVariable UUID id) {
+        Currency currency = currencyService.getCurrencyById(id);
+        if (currency == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        currencyService.deleteCurrency(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
 }

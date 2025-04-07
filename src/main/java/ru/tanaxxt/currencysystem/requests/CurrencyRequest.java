@@ -2,6 +2,7 @@ package ru.tanaxxt.currencysystem.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import ru.tanaxxt.currencysystem.entities.Currency;
 
 @Getter
 public class CurrencyRequest {
@@ -15,4 +16,14 @@ public class CurrencyRequest {
     private String priceChangeRange;
 
     private String description;
+
+
+    public Currency toCurrency() {
+        Currency currency = new Currency();
+        currency.setName(name);
+        currency.setBaseCurrency(baseCurrency);
+        currency.setPriceChangeRange(priceChangeRange);
+        currency.setDescription(description);
+        return currency;
+    }
 }
