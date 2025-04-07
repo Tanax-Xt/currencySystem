@@ -16,7 +16,7 @@ import ru.tanaxxt.currencysystem.requests.CurrencyRequest;
 @Validated
 @Tag(name = "Currencies")
 public class CurrencyController {
-    @GetMapping("")
+    @GetMapping()
     @Operation(summary = "Получить список отслеживаемых валют")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешный запрос, возвращает список валют"),
@@ -28,7 +28,7 @@ public class CurrencyController {
     }
 
 
-    @PostMapping("")
+    @PostMapping()
     @Operation(summary = "Добавить новую валюту для отслеживания")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Валюта успешно добавлена"),
