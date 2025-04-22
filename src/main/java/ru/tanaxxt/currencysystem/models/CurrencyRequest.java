@@ -1,4 +1,4 @@
-package ru.tanaxxt.currencysystem.requests;
+package ru.tanaxxt.currencysystem.models;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

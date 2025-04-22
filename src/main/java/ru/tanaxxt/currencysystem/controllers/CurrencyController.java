@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.tanaxxt.currencysystem.entities.Currency;
-import ru.tanaxxt.currencysystem.requests.CurrencyRequest;
+import ru.tanaxxt.currencysystem.models.CurrencyRequest;
 import ru.tanaxxt.currencysystem.services.CurrencyService;
 
 import java.util.List;
