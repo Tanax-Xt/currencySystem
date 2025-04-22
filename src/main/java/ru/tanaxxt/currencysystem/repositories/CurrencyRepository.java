@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface CurrencyRepository extends JpaRepository<Currency, UUID> {
     List<Currency> findByIsDeletedFalse();
-    Optional<Currency> findByNameAndIsDeletedFalse(String name);
+    Optional<Currency> findByNameAndIsDeletedFalseOrBaseCurrency(String name, String baseCurrency);
     Optional<Currency> findByIdAndIsDeletedFalse(UUID id);
 }

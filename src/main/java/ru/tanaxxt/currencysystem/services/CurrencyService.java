@@ -27,7 +27,8 @@ public class CurrencyService {
 
     @Transactional
     public Currency addCurrency(Currency currency) {
-        Currency existingCurrency = currencyRepository.findByNameAndIsDeletedFalse(currency.getName()).orElse(null);
+        Currency existingCurrency = currencyRepository.findByNameAndIsDeletedFalseOrBaseCurrency(currency.getName(),
+                currency.getBaseCurrency()).orElse(null);
         if (existingCurrency != null) {
             return null;
         }
