@@ -37,6 +37,10 @@ public class CurrencyRateJob {
 
         return currencyService.getAllCurrencies()
                 .stream()
+                .filter(currency -> {
+                    Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
+                    return matcher.find();
+                })
                 .collect(Collectors
                         .toMap(Currency::getBaseCurrency, currency -> {
                                     Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
