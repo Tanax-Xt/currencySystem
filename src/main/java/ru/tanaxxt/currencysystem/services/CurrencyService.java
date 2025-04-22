@@ -15,6 +15,14 @@ public class CurrencyService {
 
     private final CurrencyRepository currencyRepository;
 
+    private Currency updateCurrencyParams(Currency currencyToUpdate, Currency newCurrency) {
+        currencyToUpdate.setName(newCurrency.getName());
+        currencyToUpdate.setBaseCurrency(newCurrency.getBaseCurrency());
+        currencyToUpdate.setPriceChangeRange(newCurrency.getPriceChangeRange());
+        currencyToUpdate.setDescription(newCurrency.getDescription());
+        return currencyToUpdate;
+    }
+
     @Transactional(readOnly = true)
     public List<Currency> getAllCurrencies() {
         return currencyRepository.findByIsDeletedFalse();
@@ -27,10 +35,14 @@ public class CurrencyService {
 
     @Transactional
     public Currency addCurrency(Currency currency) {
-        Currency existingCurrency = currencyRepository.findByNameAndIsDeletedFalseOrBaseCurrency(currency.getName(),
+        Currency existingCurrency = currencyRepository.findByNameOrBaseCurrency(currency.getName(),
                 currency.getBaseCurrency()).orElse(null);
         if (existingCurrency != null) {
-            return null;
+            if (!existingCurrency.isDeleted()) {
+                return null;
+            }
+            existingCurrency.setDeleted(false);
+            return currencyRepository.save(updateCurrencyParams(existingCurrency, currency));
         }
         return currencyRepository.save(currency);
     }
@@ -41,20 +53,18 @@ public class CurrencyService {
         if (currencyToUpdate == null) {
             return null;
         }
-        currencyToUpdate.setName(currency.getName());
-        currencyToUpdate.setBaseCurrency(currency.getBaseCurrency());
-        currencyToUpdate.setPriceChangeRange(currency.getPriceChangeRange());
-        currencyToUpdate.setDescription(currency.getDescription());
-        return currencyRepository.save(currencyToUpdate);
+        return currencyRepository.save(updateCurrencyParams(currencyToUpdate, currency));
     }
 
     @Transactional
-    public void deleteCurrency(UUID id) {
+    public boolean deleteCurrency(UUID id) {
         Currency currencyToDelete = currencyRepository.findByIdAndIsDeletedFalse(id).orElse(null);
         if (currencyToDelete == null) {
-            return;
+            return false;
         }
         currencyToDelete.setDeleted(true);
         currencyRepository.save(currencyToDelete);
+
+        return true;
     }
 }
