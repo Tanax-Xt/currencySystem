@@ -46,6 +46,14 @@ public class CurrencyRateJob {
                         ));
     }
 
+    private Stream<CurrencyRateDto> filterRates(Map<String, Double> codes, Stream<CurrencyRateDto> rates) {
+        return rates
+                .filter(r -> codes.containsKey(r.getCode()))
+                .filter(r -> codes.get(r.getCode()) >= 0 ?
+                        (100 * (r.getValue() / r.getPrevious() - 1) >= codes.get(r.getCode()))
+                        : (100 * (r.getValue() / r.getPrevious() - 1) <= codes.get(r.getCode())));
+    }
+
     private void prettyPrintRates(CurrencyRateDto currencyRateDto) {
         double percent = 100 * (currencyRateDto.getValue() / currencyRateDto.getPrevious() - 1);
         if (percent >= 0) {
@@ -55,17 +63,13 @@ public class CurrencyRateJob {
         }
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     @Scheduled(cron = "${currency-tracker.cb-api-job-cron}")
     public void checkRates() {
         Map<String, Double> codes = getCodesAndRanges();
 
         Stream<CurrencyRateDto> rates = fetchRates();
-        rates
-                .filter(r -> codes.containsKey(r.getCode()))
-                .filter(r -> codes.get(r.getCode()) >= 0 ?
-                        (100 * (r.getValue() / r.getPrevious() - 1) >= codes.get(r.getCode()))
-                        : (100 * (r.getValue() / r.getPrevious() - 1) <= codes.get(r.getCode())))
-                .forEach(this::prettyPrintRates);
+
+        filterRates(codes, rates).forEach(this::prettyPrintRates);
     }
 }
