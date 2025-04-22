@@ -3,6 +3,8 @@ plugins {
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openapi.generator") version "7.2.0"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.spring") version "1.8.22"
 }
 
 group = "ru.TanaxXt"
@@ -36,7 +38,8 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     runtimeOnly("org.postgresql:postgresql")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
 
 tasks.withType<Test> {
@@ -46,14 +49,15 @@ tasks.withType<Test> {
 
 openApiGenerate {
     generatorName.set("java")
-    inputSpec.set("$rootDir/openApi.yaml") // Файл OpenAPI
-    outputDir.set("$buildDir/generated") // Папка для генерации
-    apiPackage.set("ru.tanaxxt.currencysystem.api") // Пакет для API-интерфейсов
-    modelPackage.set("ru.tanaxxt.currencysystem.model") // Пакет для моделей
+    inputSpec.set("$rootDir/openApi.yaml")
+    outputDir.set("$buildDir/generated")
+    apiPackage.set("ru.tanaxxt.currencysystem.controllers")
+    modelPackage.set("ru.tanaxxt.currencysystem.models")
+    modelPackage.set("ru.tanaxxt.currencysystem.entities")
     configOptions.set(
         mapOf(
             "dateLibrary" to "java8",
-            "serializationLibrary" to "gson" // Можно поменять на "moshi" или "jackson"
+            "serializationLibrary" to "gson"
         )
     )
 }

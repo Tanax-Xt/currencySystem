@@ -1,15 +1,12 @@
-package ru.tanaxxt.currencysystem;
+package ru.tanaxxt.currencysystem
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+
 
 @SpringBootApplication
-@EnableScheduling
-public class CurrencySystemApplication {
+class Application
 
-    public static void main(String[] args) {
-        SpringApplication.run(CurrencySystemApplication.class, args);
-    }
-
+fun main(args: Array<String>) {
+    runApplication<Application>(*args)
 }
