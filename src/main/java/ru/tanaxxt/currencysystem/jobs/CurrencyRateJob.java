@@ -55,9 +55,9 @@ public class CurrencyRateJob {
         }
     }
 
-    @PostConstruct
+//    @PostConstruct
     @Scheduled(cron = "${currency-tracker.cb-api-job-cron}")
-    public void printRates() {
+    public void checkRates() {
         Map<String, Double> codes = getCodesAndRanges();
 
         Stream<CurrencyRateDto> rates = fetchRates();
