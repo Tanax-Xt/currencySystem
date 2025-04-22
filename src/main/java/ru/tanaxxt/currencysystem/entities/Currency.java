@@ -17,7 +17,7 @@ public class Currency {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String baseCurrency;
 
     @Column(nullable = false)
