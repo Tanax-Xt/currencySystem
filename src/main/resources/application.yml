@@ -18,3 +18,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog.sql
     enabled: true
+
+currency-tracker:
+  cb-api-url: "https://www.cbr-xml-daily.ru/daily_json.js"
+  cb-api-job-cron: "0 0 * * * *"
