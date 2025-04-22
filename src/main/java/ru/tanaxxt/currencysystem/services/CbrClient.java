@@ -36,11 +36,12 @@ public class CbrClient {
                     Map.Entry<String, JsonNode> entry = fields.next();
                     JsonNode node = entry.getValue();
 
-                    CurrencyRateDto dto = new CurrencyRateDto();
-                    dto.setCode(node.get("CharCode").asText());
-                    dto.setName(node.get("Name").asText());
-                    dto.setValue(node.get("Value").asDouble());
-                    dto.setPrevious(node.get("Previous").asDouble());
+                    CurrencyRateDto dto = new CurrencyRateDto(
+                            node.get("CharCode").asText(),
+                            node.get("Name").asText(),
+                            node.get("Value").asDouble(),
+                            node.get("Previous").asDouble()
+                    );
 
                     result.add(dto);
                 }

@@ -1,15 +1,6 @@
-package ru.tanaxxt.currencysystem.models;
+package ru.tanaxxt.currencysystem.models
 
-import lombok.*;
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class CurrencyRateDto {
-    private String code;
-    private String name;
-    private double value;
-    private double previous;
-}
+data class CurrencyRateDto(val code: String,
+                           val name: String,
+                           val value: Double,
+                           val previous: Double)
