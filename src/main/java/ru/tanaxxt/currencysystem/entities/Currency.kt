@@ -1,31 +1,25 @@
-package ru.tanaxxt.currencysystem.entities;
+package ru.tanaxxt.currencysystem.entities
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.UUID;
+import jakarta.persistence.*
+import java.util.UUID
 
 @Entity
-@Getter
-@Setter
-public class Currency {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+data class Currency(
     @Column(nullable = false)
-    private String name;
+    var name: String = "",
 
     @Column(nullable = false, unique = true)
-    private String baseCurrency;
+    var baseCurrency: String = "",
 
     @Column(nullable = false)
-    private String priceChangeRange;
+    var priceChangeRange: String = "",
 
-    @Column()
-    private String description;
+    @Column
+    var description: String? = null,
+) {
+    @Id
+    var id: UUID = UUID.randomUUID()
 
-    @Column()
-    private boolean isDeleted;
+    @Column
+    var isDeleted: Boolean = false
 }

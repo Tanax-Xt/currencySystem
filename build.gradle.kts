@@ -4,7 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openapi.generator") version "7.2.0"
     kotlin("jvm") version "2.1.20"
-    kotlin("plugin.spring") version "1.8.22"
+    kotlin("plugin.spring") version "2.1.20"
 }
 
 group = "ru.TanaxXt"
@@ -14,6 +14,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(23)
     }
+}
+
+kotlin {
+    jvmToolchain(23)
 }
 
 configurations {
@@ -40,6 +44,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 }
 
 tasks.withType<Test> {

@@ -1,29 +1,34 @@
-package ru.tanaxxt.currencysystem.models;
+package ru.tanaxxt.currencysystem.models
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import ru.tanaxxt.currencysystem.entities.Currency;
+import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.validation.constraints.NotBlank
+import ru.tanaxxt.currencysystem.entities.Currency
 
-@Getter
-public class CurrencyRequest {
-    @NotBlank(message = "Name is required")
-    private String name;
+data class CurrencyRequest(
+    @JsonProperty(value = "name", required = true)
+    @field:NotBlank(message = "Name is required")
+    val name: String,
 
-    @NotBlank(message = "Base currency is required")
-    private String baseCurrency = "RUB";
+    @JsonProperty(value = "baseCurrency", required = true)
+    @field:NotBlank(message = "Base currency is required")
+    val baseCurrency: String,
 
-    @NotBlank(message = "Price change range is required")
-    private String priceChangeRange;
+    @JsonProperty(value = "priceChangeRange", required = true)
+    @field:NotBlank(message = "Price change range is required")
+    val priceChangeRange: String,
 
-    private String description;
+    @JsonProperty("description")
+    val description: String?
 
+) {
+    fun toCurrency(): Currency {
+        val currency = Currency(
+            name = name,
+            baseCurrency = baseCurrency,
+            priceChangeRange = priceChangeRange,
+            description = description
+        )
 
-    public Currency toCurrency() {
-        Currency currency = new Currency();
-        currency.setName(name);
-        currency.setBaseCurrency(baseCurrency);
-        currency.setPriceChangeRange(priceChangeRange);
-        currency.setDescription(description);
-        return currency;
+        return currency
     }
 }

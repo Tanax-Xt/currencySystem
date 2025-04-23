@@ -31,12 +31,27 @@ public class CurrencyRateJob {
         return cbrClient.fetchRates().stream();
     }
 
+    private boolean isNumber(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     private Map<String, Double> getCodesAndRanges() {
         String regex = "([^%])+";
         Pattern pattern = Pattern.compile(regex);
 
         return currencyService.getAllCurrencies()
                 .stream()
+                .filter(currency -> !currency.isDeleted())
+                .filter(currency -> {
+                    Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
+                    matcher.find();
+                    return isNumber(matcher.group(0));
+                })
                 .collect(Collectors
                         .toMap(Currency::getBaseCurrency, currency -> {
                                     Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
@@ -63,7 +78,7 @@ public class CurrencyRateJob {
         }
     }
 
-    //    @PostConstruct
+    @PostConstruct
     @Scheduled(cron = "${currency-tracker.cb-api-job-cron}")
     public void checkRates() {
         Map<String, Double> codes = getCodesAndRanges();

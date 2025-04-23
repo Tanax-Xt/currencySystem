@@ -5,8 +5,8 @@ import org.springframework.boot.runApplication
 
 
 @SpringBootApplication
-class Application
+class CurrencySystemApplication
 
 fun main(args: Array<String>) {
-    runApplication<Application>(*args)
+    runApplication<CurrencySystemApplication>(*args)
 }
