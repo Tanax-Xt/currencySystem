@@ -1,16 +1,13 @@
-package ru.tanaxxt.currencysystem.repositories;
+package ru.tanaxxt.currencysystem.repositories
 
-import org.springframework.stereotype.Repository;
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.tanaxxt.currencysystem.entities.Currency;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
+import ru.tanaxxt.currencysystem.entities.Currency
+import java.util.*
 
 @Repository
-public interface CurrencyRepository extends JpaRepository<Currency, UUID> {
-    List<Currency> findByIsDeletedFalse();
-    Optional<Currency> findByNameOrBaseCurrency(String name, String baseCurrency);
-    Optional<Currency> findByIdAndIsDeletedFalse(UUID id);
+interface CurrencyRepository: JpaRepository<Currency, UUID> {
+    fun findByIdAndIsDeletedFalse(id: UUID): Optional<Currency>
+    fun findByNameOrBaseCurrency(name: String, baseCurrency: String): Optional<Currency>
+    fun findByIsDeletedFalse(): List<Currency>
 }
