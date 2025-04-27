@@ -1,90 +1,79 @@
-package ru.tanaxxt.currencysystem.jobs;
+package ru.tanaxxt.currencysystem.jobs
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import ru.tanaxxt.currencysystem.configs.CurrencyConfig;
-import ru.tanaxxt.currencysystem.models.CurrencyRateDto;
-import ru.tanaxxt.currencysystem.services.CbrClient;
-import ru.tanaxxt.currencysystem.entities.Currency;
+import jakarta.annotation.PostConstruct
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+import ru.tanaxxt.currencysystem.configs.CurrencyConfig
+import ru.tanaxxt.currencysystem.entities.Currency
+import ru.tanaxxt.currencysystem.models.CurrencyRateDto
+import ru.tanaxxt.currencysystem.services.CbrClient
+import ru.tanaxxt.currencysystem.services.CurrencyService
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import ru.tanaxxt.currencysystem.services.CurrencyService;
 
+private fun isNumber(str: String): Boolean {
+    try {
+        str.toDouble()
+        return true
+    } catch (e: NumberFormatException) {
+        return false
+    }
+}
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+private fun calculatePercentChange(previous: Double, current: Double): Double {
+    return 100 * (current / previous - 1)
+}
 
 @Component
-@RequiredArgsConstructor
-@EnableConfigurationProperties(CurrencyConfig.class)
-public class CurrencyRateJob {
+@EnableConfigurationProperties(CurrencyConfig::class)
+class CurrencyRateJob(
+    private val cbrClient: CbrClient,
+    private val currencyService: CurrencyService
+) {
+    private fun fetchRates() = cbrClient.fetchRates().stream()
 
-    private final CbrClient cbrClient;
-    private final CurrencyService currencyService;
-
-    private Stream<CurrencyRateDto> fetchRates() {
-        return cbrClient.fetchRates().stream();
-    }
-
-    private boolean isNumber(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private Map<String, Double> getCodesAndRanges() {
-        String regex = "([^%])+";
-        Pattern pattern = Pattern.compile(regex);
-
+    private fun getCodesAndRanges(): Map<String, Double> {
         return currencyService.getAllCurrencies()
-                .stream()
-                .filter(currency -> !currency.isDeleted())
-                .filter(currency -> {
-                    Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
-                    matcher.find();
-                    return isNumber(matcher.group(0));
-                })
-                .collect(Collectors
-                        .toMap(Currency::getBaseCurrency, currency -> {
-                                    Matcher matcher = pattern.matcher(currency.getPriceChangeRange());
-                                    matcher.find();
-                                    return Double.parseDouble(matcher.group(0));
-                                }
-                        ));
+            .stream()
+            .filter { currency: Currency -> !currency.isDeleted }
+            .filter { currency: Currency -> isNumber(currency.priceChangeRange.split('%')[0]) }
+            .collect(
+                Collectors
+                    .toMap(
+                        Currency::baseCurrency,
+                        { currency: Currency -> currency.priceChangeRange.split('%')[0].toDouble() }
+                    )
+            )
     }
 
-    private Stream<CurrencyRateDto> filterRates(Map<String, Double> codes, Stream<CurrencyRateDto> rates) {
+    private fun filterRates(codes: Map<String, Double>, rates: Stream<CurrencyRateDto>): Stream<CurrencyRateDto> {
         return rates
-                .filter(r -> codes.containsKey(r.getCode()))
-                .filter(r -> codes.get(r.getCode()) >= 0 ?
-                        (100 * (r.getValue() / r.getPrevious() - 1) >= codes.get(r.getCode()))
-                        : (100 * (r.getValue() / r.getPrevious() - 1) <= codes.get(r.getCode())));
+            .filter { r: CurrencyRateDto -> codes.containsKey(r.code) }
+            .filter { r: CurrencyRateDto ->
+                if (codes[r.code]!! >= 0)
+                    calculatePercentChange(r.previous, r.value) >= codes[r.code]!!
+                else
+                    calculatePercentChange(r.previous, r.value) <= codes[r.code]!!
+            }
     }
 
-    private void prettyPrintRates(CurrencyRateDto currencyRateDto) {
-        double percent = 100 * (currencyRateDto.getValue() / currencyRateDto.getPrevious() - 1);
+    private fun prettyPrintRates(currencyRateDto: CurrencyRateDto) {
+        val percent = calculatePercentChange(currencyRateDto.previous, currencyRateDto.value)
         if (percent >= 0) {
-            System.out.printf("❗Курс \"%s\" вырос на %.2f%%%n", currencyRateDto.getName(), percent);
+            System.out.printf("❗Курс \"%s\" вырос на %.2f%%%n", currencyRateDto.name, percent)
         } else {
-            System.out.printf("❗Курс \"%s\" упал на %.2f%%%n", currencyRateDto.getName(), Math.abs(percent));
+            System.out.printf("❗Курс \"%s\" упал на %.2f%%%n", currencyRateDto.name, Math.abs(percent))
         }
     }
 
     @PostConstruct
-    @Scheduled(cron = "${currency-tracker.cb-api-job-cron}")
-    public void checkRates() {
-        Map<String, Double> codes = getCodesAndRanges();
-
-        Stream<CurrencyRateDto> rates = fetchRates();
-
-        filterRates(codes, rates).forEach(this::prettyPrintRates);
+    @Scheduled(cron = "\${currency-tracker.cb-api-job-cron}")
+    fun checkRates() {
+        val codes = getCodesAndRanges()
+        val rates = fetchRates()
+        val filteredRates = filterRates(codes, rates)
+        filteredRates.forEach(this::prettyPrintRates)
     }
 }
