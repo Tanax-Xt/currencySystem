@@ -31,7 +31,7 @@ class CurrencyController(
             ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
         ]
     )
-    fun getCurrencies(): List<Currency> = currencyService.allCurrencies
+    fun getCurrencies(): List<Currency> = currencyService.getAllCurrencies()
 
     @PostMapping
     @Operation(summary = "Добавить новую валюту для отслеживания")
