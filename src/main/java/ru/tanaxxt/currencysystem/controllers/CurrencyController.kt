@@ -13,6 +13,7 @@ import ru.tanaxxt.currencysystem.entities.Currency
 import ru.tanaxxt.currencysystem.models.CurrencyRequest
 import ru.tanaxxt.currencysystem.services.CurrencyService
 import java.util.*
+import kotlin.NoSuchElementException
 
 @RestController
 @RequestMapping("/currencies")
@@ -43,10 +44,12 @@ class CurrencyController(
         ]
     )
     fun postCurrency(@Valid @RequestBody currencyRequest: CurrencyRequest): ResponseEntity<Currency> {
-        val createdCurrency = currencyService.addCurrency(currencyRequest.toCurrency())
-            ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null)
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCurrency)
+        try {
+            val createdCurrency = currencyService.addCurrency(currencyRequest.toCurrency())
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCurrency)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null)
+        }
     }
 
     @GetMapping("/{id}")
@@ -79,10 +82,12 @@ class CurrencyController(
         @PathVariable id: UUID,
         @Valid @RequestBody currencyRequest: CurrencyRequest
     ): ResponseEntity<Currency> {
-        val updatedCurrency = currencyService.updateCurrency(id, currencyRequest.toCurrency())
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
-
-        return ResponseEntity.ok(updatedCurrency)
+        try {
+            val updatedCurrency = currencyService.updateCurrency(id, currencyRequest.toCurrency())
+            return ResponseEntity.ok(updatedCurrency)
+        } catch (e: NoSuchElementException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -94,9 +99,12 @@ class CurrencyController(
             ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
         ]
     )
-    fun deleteCurrency(@PathVariable id: UUID): ResponseEntity<Void> =
-        if (currencyService.deleteCurrency(id))
+    fun deleteCurrency(@PathVariable id: UUID): ResponseEntity<Void> {
+        return try {
+            currencyService.deleteCurrency(id)
             ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        else
-            ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        } catch (e: NoSuchElementException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
+        }
+    }
 }

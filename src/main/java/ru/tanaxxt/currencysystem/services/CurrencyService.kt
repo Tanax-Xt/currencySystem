@@ -32,18 +32,18 @@ class CurrencyService(val currencyRepository: CurrencyRepository) {
             existingCurrency.isDeleted = false
             return currencyRepository.save(updateCurrencyParams(existingCurrency, currency))
         }
-        return null
+        throw IllegalArgumentException("Currency already added")
     }
 
     @Transactional
     fun updateCurrency(id: UUID, currency: Currency): Currency? {
-        val existingCurrency = getCurrencyById(id) ?: return null
+        val existingCurrency = getCurrencyById(id) ?: throw NoSuchElementException()
         return currencyRepository.save(updateCurrencyParams(existingCurrency, currency))
     }
 
     @Transactional
     fun deleteCurrency(id: UUID): Boolean {
-        val existingCurrency = getCurrencyById(id) ?: return false
+        val existingCurrency = getCurrencyById(id) ?: throw NoSuchElementException()
         existingCurrency.isDeleted = true
         currencyRepository.save(existingCurrency)
         return true
