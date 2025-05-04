@@ -14,12 +14,7 @@ import java.util.stream.Stream
 
 
 private fun isNumber(str: String): Boolean {
-    try {
-        str.toDouble()
-        return true
-    } catch (e: NumberFormatException) {
-        return false
-    }
+    return str.toDoubleOrNull() != null
 }
 
 private fun calculatePercentChange(previous: Double, current: Double): Double {
