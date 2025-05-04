@@ -1,25 +1,24 @@
 package ru.tanaxxt.currencysystem.jobs
 
-import jakarta.annotation.PostConstruct
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 import ru.tanaxxt.currencysystem.configs.CurrencyConfig
 import ru.tanaxxt.currencysystem.entities.Currency
 import ru.tanaxxt.currencysystem.models.CurrencyRateDto
 import ru.tanaxxt.currencysystem.services.CbrClient
 import ru.tanaxxt.currencysystem.services.CurrencyService
+
+import jakarta.annotation.PostConstruct
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 import java.util.stream.Stream
+import kotlin.math.abs
 
 
-private fun isNumber(str: String): Boolean {
-    return str.toDoubleOrNull() != null
-}
+private fun isNumber(str: String) = str.toDoubleOrNull() != null
 
-private fun calculatePercentChange(previous: Double, current: Double): Double {
-    return 100 * (current / previous - 1)
-}
+private fun calculatePercentChange(previous: Double, current: Double) = 100 * (current / previous - 1)
+
 
 @Component
 @EnableConfigurationProperties(CurrencyConfig::class)
@@ -59,7 +58,7 @@ class CurrencyRateJob(
         if (percent >= 0) {
             System.out.printf("❗Курс \"%s\" вырос на %.2f%%%n", currencyRateDto.name, percent)
         } else {
-            System.out.printf("❗Курс \"%s\" упал на %.2f%%%n", currencyRateDto.name, Math.abs(percent))
+            System.out.printf("❗Курс \"%s\" упал на %.2f%%%n", currencyRateDto.name, abs(percent))
         }
     }
 
